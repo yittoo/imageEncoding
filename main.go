@@ -78,7 +78,7 @@ func main() {
 		dm := decode(f1, f2)
 		fmt.Println("Decoded message: ", dm)
 	default:
-		fmt.Println("You need to pass app mode with -mode, possible values are: new / encode / decode / grayscale")
+		fmt.Println("You need to pass app mode with -mode, possible values are: new / encode / decode / grayscale, see --help for more details")
 	}
 }
 
@@ -176,7 +176,7 @@ func encode(f *os.File, fname *string, m *string) {
 			var eb byte
 
 			if i < len(*m) {
-				// if equal to space turn to 0x1f
+				// if equal to space turn to 0x1f otherwise remove binary abcxyzmn's abc part to reduce pixel mutation amount
 				if bs[i] == 0x20 {
 					eb = bs[i] - 1
 				} else {
