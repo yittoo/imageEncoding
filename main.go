@@ -275,6 +275,7 @@ func decodeColor(c1, c2 uint8) byte {
 	} else {
 		v = (c2 - c1)
 	}
+	// if it is encoded space which is 0x20 - 1 = 0x1f, return 0x20
 	if v == 0x1f {
 		return 0x20
 	}

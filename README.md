@@ -6,3 +6,5 @@
 - Grayscales image
 
 See imageEncoding.exe --help or go run main.go --help for additional details
+
+This is an experimental one-sitting code, do not use important files with this code without backing up. Code is as is.
