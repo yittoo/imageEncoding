@@ -14,6 +14,7 @@ var iname *string
 var iiname *string
 var oname *string
 var appmode *string
+var toColor *string
 var isCreateNew *bool
 var isEncodeMode *bool
 var isDecodeMode *bool
@@ -35,8 +36,12 @@ func init() {
 	decode - outputs a message using two images (one encoded with message of other) given by -i and -ii flags
 		example: 'executible -mode=decode -i=img.png -ii=encodedimg.png'
 	grayscale - outputs an image (name given in -o) using image given in -i
-		example: 'executible -mode=grayscale -o=newimg.png'`
+		example: 'executible -mode=grayscale -o=newimg.png'
+	negative - outputs an image (name given in -o) using image given in -i
+		example: 'executible -mode=negative -o=newimg.png
+	paint [to] - straps the image of colors except the given one and outputs as an image with name given in -o flag`
 	appmode = flag.String("mode", "", appmodehelp)
+	toColor = flag.String("to", "", "used for -paint flag, possible values are red, green, blue")
 	messageToEncode = flag.String("m", "", "message that will be encoded onto input image")
 	flag.Parse()
 }
@@ -53,7 +58,23 @@ func main() {
 			fmt.Println(err)
 		}
 		defer f.Close()
-		grayscale(f, oname)
+		Grayscale(f, oname)
+	case "negative":
+		fmt.Println("Taking negative of image")
+		f, err := openGivenFile(iname)
+		if err != nil {
+			fmt.Println(err)
+		}
+		defer f.Close()
+		Negative(f, oname)
+	case "paint":
+		fmt.Println("Taking negative of image")
+		f, err := openGivenFile(iname)
+		if err != nil {
+			fmt.Println(err)
+		}
+		defer f.Close()
+		PaintTo(f, oname, toColor)
 	case "encode":
 		fmt.Println("Encoding image")
 		f, err := openGivenFile(iname)
@@ -111,40 +132,6 @@ func createNewPng(fname *string) {
 		}
 	}
 	png.Encode(f, ni)
-}
-
-func grayscale(f *os.File, fname *string) {
-	ri, err := png.Decode(f)
-	if err != nil {
-		fmt.Println(err)
-	}
-	or := ri.Bounds()
-	size := or.Size()
-	ni := image.NewRGBA(or)
-
-	for x := 0; x < size.X; x++ {
-		for y := 0; y < size.Y; y++ {
-			r, g, b, _ := ri.At(x, y).RGBA()
-			gs := (r + g + b) / 3
-			ni.Set(x, y, color.RGBA{
-				R: uint8(gs),
-				G: uint8(gs),
-				B: uint8(gs),
-				A: 255,
-			})
-		}
-	}
-
-	nf, err := os.Create(*fname)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer nf.Close()
-
-	err = png.Encode(nf, ni)
-	if err != nil {
-		fmt.Println(err)
-	}
 }
 
 func encode(f *os.File, fname *string, m *string) {
